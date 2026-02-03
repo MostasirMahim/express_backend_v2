@@ -1,8 +1,8 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs-extra';
-import path from 'path';
-import { promisify } from 'util';
+// import path from 'path'; // Unused
 import Media from './media.model.js';
+import logger from '../../utils/logger.js';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -73,7 +73,7 @@ export const uploadToLocalService = async (file, userId) => {
   } catch (error) {
     // If DB creator fails, we should attempt to remove the uploaded file to prevent orphans
     if (file && file.path) {
-        await fs.remove(file.path).catch(console.error);
+        await fs.remove(file.path).catch(err => logger.error(`Failed to cleanup file: ${err.message}`));
     }
     throw new Error(`Local upload record creation failed: ${error.message}`);
   }
