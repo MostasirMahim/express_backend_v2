@@ -1,8 +1,11 @@
 /**
  * Environment configuration
+ * DEPRECATED: Use process.env directly.
+ * 
  * Centralized configuration file for secrets, ports, and other env vars.
  * Avoid hardcoding values; easy to switch between dev/staging/prod
  */
+/*
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -17,3 +20,4 @@ export const env = {
 
   COOKIE_SECURE: process.env.NODE_ENV === "production",
 };
+*/

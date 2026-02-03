@@ -4,47 +4,40 @@ import {
     deleteMediaService, 
     getMediaByIdService 
   } from './media.service.js';
+  import { successResponse, errorResponse } from '../../utils/response.js';
+  import logger from '../../utils/logger.js';
   
   export const uploadLocal = async (req, res) => {
     try {
       if (!req.file) {
-        return res.status(400).json({ status: 'fail', message: 'No file uploaded' });
+        return errorResponse(res, 400, 'No file uploaded');
       }
   
-      // req.user is populated by auth middleware (assuming it exists and follows standard pattern)
       const userId = req.user ? req.user._id : null;
-  
       const result = await uploadToLocalService(req.file, userId);
   
-      res.status(201).json({
-        status: 'success',
-        message: 'File uploaded locally successfully',
-        data: result
-      });
+      logger.info(`File uploaded locally: ${result.filename}`);
+      return successResponse(res, 201, 'File uploaded locally successfully', result);
     } catch (error) {
-      console.error('Local Upload Error:', error);
-      res.status(500).json({ status: 'error', message: error.message });
+      logger.error(`Local Upload Error: ${error.message}`);
+      return errorResponse(res, 500, error.message);
     }
   };
   
   export const uploadCloudinary = async (req, res) => {
     try {
       if (!req.file) {
-        return res.status(400).json({ status: 'fail', message: 'No file uploaded' });
+        return errorResponse(res, 400, 'No file uploaded');
       }
   
       const userId = req.user ? req.user._id : null;
-  
       const result = await uploadToCloudinaryService(req.file, userId);
   
-      res.status(201).json({
-        status: 'success',
-        message: 'File uploaded to Cloudinary successfully',
-        data: result
-      });
+      logger.info(`File uploaded to Cloudinary: ${result.filename}`);
+      return successResponse(res, 201, 'File uploaded to Cloudinary successfully', result);
     } catch (error) {
-      console.error('Cloudinary Upload Error:', error);
-      res.status(500).json({ status: 'error', message: error.message });
+      logger.error(`Cloudinary Upload Error: ${error.message}`);
+      return errorResponse(res, 500, error.message);
     }
   };
   
@@ -52,26 +45,22 @@ import {
     try {
       const media = await getMediaByIdService(req.params.id);
       if (!media) {
-        return res.status(404).json({ status: 'fail', message: 'Media not found' });
+        return errorResponse(res, 404, 'Media not found');
       }
-      res.status(200).json({
-        status: 'success',
-        data: media
-      });
+      return successResponse(res, 200, 'Media retrieved successfully', media);
     } catch (error) {
-      res.status(500).json({ status: 'error', message: error.message });
+      logger.error(`Get Media Error: ${error.message}`);
+      return errorResponse(res, 500, error.message);
     }
   };
   
   export const deleteMedia = async (req, res) => {
     try {
       const result = await deleteMediaService(req.params.id);
-      res.status(200).json({
-        status: 'success',
-        message: result.message
-      });
+      logger.info(`Media deleted: ${req.params.id}`);
+      return successResponse(res, 200, result.message);
     } catch (error) {
-      console.error('Delete Media Error:', error);
-      res.status(500).json({ status: 'error', message: error.message });
+      logger.error(`Delete Media Error: ${error.message}`);
+      return errorResponse(res, 500, error.message);
     }
   };
