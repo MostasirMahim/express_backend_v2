@@ -6,6 +6,7 @@ import connectMongoDB from "./config/db.js";
 import redisClient from "./config/redis.js";
 import { connectRabbitMQ } from "./config/rabbitmq.js";
 import { startNotificationWorker } from "./workers/notification.worker.js";
+import { runActivityWorker } from "./modules/activity/activity.worker.js";
 
 const PORT = process.env.PORT || 8000;
 
@@ -26,7 +27,7 @@ const startServer = async () => {
         // 3. Start Background Workers
         await connectRabbitMQ();
         startNotificationWorker();
-        // runActivityWorker(); 
+        runActivityWorker(); 
 
         const server = http.createServer(app);
 

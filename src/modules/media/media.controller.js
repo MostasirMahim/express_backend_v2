@@ -6,6 +6,7 @@ import {
   } from './media.service.js';
   import { successResponse, errorResponse } from '../../utils/response.js';
   import logger from '../../utils/logger.js';
+  import { validateMediaId } from './media.validator.js';
   
   export const uploadLocal = async (req, res) => {
     try {
@@ -43,6 +44,11 @@ import {
   
   export const getMedia = async (req, res) => {
     try {
+      const { error } = validateMediaId(req.params);
+      if (error) {
+        return errorResponse(res, 400, error.details[0].message);
+      }
+
       const media = await getMediaByIdService(req.params.id);
       if (!media) {
         return errorResponse(res, 404, 'Media not found');
@@ -56,6 +62,11 @@ import {
   
   export const deleteMedia = async (req, res) => {
     try {
+      const { error } = validateMediaId(req.params);
+      if (error) {
+        return errorResponse(res, 400, error.details[0].message);
+      }
+
       const result = await deleteMediaService(req.params.id);
       logger.info(`Media deleted: ${req.params.id}`);
       return successResponse(res, 200, result.message);
